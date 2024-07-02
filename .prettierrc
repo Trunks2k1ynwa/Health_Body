@@ -1,0 +1,36 @@
+{
+  "semi": true,
+  "singleQuote": true,
+  "useTabs": false,
+  "trailingComma": "none",
+  "printWidth": 120,
+  "proseWrap": "never",
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "jsxSingleQuote": true,
+  "jsxBracketSameLine": false,
+  "parser": "typescript",
+  "tabWidth": 2,
+  "endOfLine": "auto",
+  "overrides": [
+    {
+      "files": ".prettierrc",
+      "options": {
+        "parser": "json"
+      }
+    }
+  ],
+  "importOrder": [
+    "^@utility",
+    "^@components",
+    "^@redux",
+    "^@models",
+    "^[./]",
+    "^[./(?=.*/)(?!/?$).?(sa|sc|c)ss]",
+    "^\\w",
+    "^[./|~/]",
+    "^[./\\u0000]"
+  ],
+  "importOrderSeparation": false,
+  "importOrderSortSpecifiers": true
+}
