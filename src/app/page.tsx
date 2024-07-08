@@ -1,32 +1,35 @@
 'use client';
 
+import { getTdee } from '@api';
 import BodyIndex from '@components/common/BodyIndex';
 import { Button } from '@components/ui/button';
 import { Input } from '@components/ui/input';
 import { Label } from '@components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui/select';
+import { Skeleton } from '@components/ui/skeleton';
+import { ActivityLevel, ExpectedBodyEnum, MaleEnum, SpeedChangeWeightEnum } from '@lib/commonTypes';
+import { ReloadIcon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
 import React from 'react';
-enum LevelExEnum {
-  Less = 0,
-  Normal = 1,
-  Fit = 2,
-  Pretty = 3,
-  Manny = 4
-}
-enum SpeedChangeWeightEnum {
-  Slow = 'slow',
-  Normal = 'normal',
-  Fast = 'fast;'
-}
+
 export default function Home() {
+  const [gender, setGender] = React.useState<MaleEnum>(MaleEnum.Male);
   const [age, setAge] = React.useState<number>(23);
+  const [isLoadingTdee, setIsLoadingTdee] = React.useState<boolean>(false);
   const [height, setHeight] = React.useState<number>(100);
   const [weight, setWeight] = React.useState<number>(20);
+  const [levelExercise, setLevelExercise] = React.useState<ActivityLevel>(ActivityLevel.Sedentary);
   const [expectedWeight, setExpectedWeight] = React.useState<number>(55);
-  const [levelExercise, setLevelExercise] = React.useState<LevelExEnum>(LevelExEnum.Less);
+  const [expectedBody, setExpectedBody] = React.useState<ExpectedBodyEnum>(ExpectedBodyEnum.ReduceFat);
   const [speedChangeWeight, setSpeedChangeWeight] = React.useState<SpeedChangeWeightEnum>(SpeedChangeWeightEnum.Normal);
+  const [yourTdee, setYourTdee] = React.useState<number>(0);
+  const listActivityLevel = [
+    ActivityLevel.Sedentary,
+    ActivityLevel.LightlyActive,
+    ActivityLevel.Active,
+    ActivityLevel.VeryActive
+  ];
   const handleChangeAge = (e: A) => {
     if (Number(e.target.value) > 99) {
       setAge(99);
@@ -46,21 +49,31 @@ export default function Home() {
   };
   const renderExerciseIntensity = () => {
     switch (levelExercise) {
-      case LevelExEnum.Less:
+      case ActivityLevel.Sedentary:
         return 'Ít hoạt động, chỉ ăn đi làm về ngủ';
-      case LevelExEnum.Normal:
+      case ActivityLevel.LightlyActive:
         return 'Có tập nhẹ nhàng, tuần 1-3';
-        break;
-      case LevelExEnum.Fit:
+      case ActivityLevel.Active:
         return 'Có vận động vừa 4-5 buổi';
-        break;
-      case LevelExEnum.Pretty:
+      case ActivityLevel.VeryActive:
         return 'Vận động nhiều 6-7 buổi';
-        break;
-      case LevelExEnum.Manny:
-        return 'Vận động rất nhiều ngày tập 2 lần';
       default:
         break;
+    }
+  };
+  const caculateTdee = async () => {
+    setIsLoadingTdee(true);
+    const params = {
+      activityLevel: levelExercise,
+      gender: gender,
+      age: age.toString(),
+      weight: weight.toString(),
+      height: height.toString()
+    };
+    const { result } = await getTdee(params);
+    if (result) {
+      setIsLoadingTdee(false);
+      setYourTdee(result);
     }
   };
   return (
@@ -107,29 +120,31 @@ export default function Home() {
         <section className='flex gap-x-10 mt-5'>
           <div>
             <h2 className='font-bold text-blue-500 text-xl mb-2'>Mục Tiêu</h2>
-            <Select>
+            <Select defaultValue={expectedBody}>
               <SelectTrigger className='w-[180px]'>
                 <SelectValue defaultChecked={true} defaultValue={'decrease'} placeholder='Select target' />
               </SelectTrigger>
               <SelectContent defaultValue={'decrease'}>
-                <SelectItem id='decrease' value='decrease'>
-                  Giảm mỡ
-                </SelectItem>
-                <SelectItem value='increase'>Tăng cân</SelectItem>
-                <SelectItem value='balance'>Duy trì</SelectItem>
+                <SelectItem value={ExpectedBodyEnum.ReduceFat}>Giảm mỡ</SelectItem>
+                <SelectItem value={ExpectedBodyEnum.BalanceFat}>Duy trì</SelectItem>
+                <SelectItem value={ExpectedBodyEnum.IncreaseFat}>Tăng cân</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
             <h2 className='font-bold text-blue-500 text-xl mb-2'>Giới tính</h2>
-            <RadioGroup className='flex py-2' defaultValue='man'>
+            <RadioGroup
+              onValueChange={value => setGender(value as MaleEnum)}
+              className='flex py-2'
+              defaultValue={gender}
+            >
               <div className='flex items-center space-x-2'>
-                <RadioGroupItem value='man' id='man' />
+                <RadioGroupItem value='male' id='male' />
                 <Label htmlFor='man'>Nam</Label>
               </div>
               <div className='flex items-center space-x-2'>
-                <RadioGroupItem value='woman' id='woman' />
-                <Label htmlFor='woman'>Nữ</Label>
+                <RadioGroupItem value='female' id='female' />
+                <Label htmlFor='female'>Nữ</Label>
               </div>
             </RadioGroup>
           </div>
@@ -154,21 +169,19 @@ export default function Home() {
         <section className='mt-5'>
           <h2 className='font-bold text-blue-500 mb-2 text-xl'>CƯỜNG ĐỘ TẬP LUYỆN</h2>
           <div className='flex gap-x-4'>
-            {Array(5)
-              .fill(0)
-              .map((item, index) => (
-                <Button
-                  onClick={() => setLevelExercise(index)}
-                  className={clsx(
-                    'min-w-16 hover:bg-blue-100 hover:text-blue-500 hover:border-blue-500',
-                    index === levelExercise ? 'bg-blue-100 text-blue-500 border-blue-500' : ''
-                  )}
-                  variant='outline'
-                  key={index}
-                >
-                  {index}
-                </Button>
-              ))}
+            {listActivityLevel.map((item, index) => (
+              <Button
+                onClick={() => setLevelExercise(item)}
+                className={clsx(
+                  'min-w-16 hover:bg-blue-50 hover:text-blue-500 hover:border-blue-500',
+                  item === levelExercise ? 'bg-blue-50 text-blue-500 border-blue-500' : ''
+                )}
+                variant='outline'
+                key={item}
+              >
+                {index}
+              </Button>
+            ))}
           </div>
           <span className='text-red-400 inline-block mt-2'>{renderExerciseIntensity()}</span>
         </section>
@@ -184,7 +197,7 @@ export default function Home() {
           </div>
           <div>
             <h2 className='font-bold text-blue-500 text-xl mb-2'>Tốc độ giảm cân</h2>
-            <Select defaultOpen={true} value={speedChangeWeight}>
+            <Select value={speedChangeWeight}>
               <SelectTrigger className='w-[180px]'>
                 <SelectValue defaultChecked={true} defaultValue={'slow'} />
               </SelectTrigger>
@@ -201,6 +214,23 @@ export default function Home() {
               </SelectContent>
             </Select>
           </div>
+        </section>
+        <section className='flex justify-center'>
+          <Button
+            onClick={caculateTdee}
+            disabled={isLoadingTdee}
+            variant={'outline'}
+            className='my-5 font-bold text-blue-500 hover:bg-blue-100 hover:text-blue-500'
+          >
+            {isLoadingTdee && <ReloadIcon className='mr-2 h-4 w-4 animate-spin' />}
+            Tính TDEE
+          </Button>
+        </section>
+        <section>
+          {isLoadingTdee && <Skeleton className='h-10 w-96 rounded-sm' />}
+          {!isLoadingTdee && !!yourTdee && (
+            <h2 className='font-bold text-blue-500 text-xl mb-2'>TDEE của bạn : {yourTdee}</h2>
+          )}
         </section>
       </section>
     </main>
