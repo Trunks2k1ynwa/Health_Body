@@ -90,7 +90,7 @@ export default function Home() {
   };
   return (
     <main className='flex flex-row min-h-screen justify-between p-12 relative'>
-      <div className='absolute right-0 bg-green-200'>
+      <div className='absolute right-0'>
         <ModeToggle />
       </div>
       <aside className='flex-[2_2_0%] border-4 border-green-300 rounded-lg p-5 box-content'>
@@ -164,7 +164,7 @@ export default function Home() {
             </RadioGroup>
           </div>
         </section>
-        <section className='flex justify-between mt-5 '>
+        <section className='flex gap-x-10 mt-5 '>
           <BodyIndex title='Tuổi' unit='(Năm)' value={age} handleChangeInput={handleChangeAge} setValue={setAge} />
           <BodyIndex
             title='Chiều cao'
