@@ -13,14 +13,14 @@ type BodyIndexProps = {
 const BodyIndex = (props: BodyIndexProps) => {
   const { setValue, handleChangeInput, value, title, unit } = props;
   return (
-    <div className='p-2 rounded-md bg-blue-50 '>
-      <h3 className='font-semibold text-xl text-blue-400 text-center'>{title}</h3>
+    <div className='p-2 rounded-md bg-green-100 '>
+      <h3 className='font-semibold text-xl text-green-400 text-center'>{title}</h3>
       <div className='flex justify-between gap-x-2'>
         <Button
           onClick={() => setValue((age: number) => age - 1)}
           variant='outline'
           size={'icon'}
-          className='rounded-full border-blue-300 border'
+          className='rounded-full border-green-300 border'
         >
           <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='size-4'>
             <path
@@ -34,13 +34,13 @@ const BodyIndex = (props: BodyIndexProps) => {
           onChange={handleChangeInput}
           value={value}
           type='number'
-          className='border-none max-w-20 font-bold text-2xl text-center focus-visible:border-none'
+          className='border-none max-w-20 font-bold text-2xl text-center focus-visible:border-none text-green-500'
         />
         <Button
           onClick={() => setValue((age: number) => age + 1)}
           variant='outline'
           size={'icon'}
-          className='rounded-full border-blue-300 border'
+          className='rounded-full border-green-300 border '
         >
           <svg
             xmlns='http://www.w3.org/2000/svg'

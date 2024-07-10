@@ -5,10 +5,14 @@ import BodyIndex from '@components/common/BodyIndex';
 import { Button } from '@components/ui/button';
 import { Input } from '@components/ui/input';
 import { Label } from '@components/ui/label';
+import { ModeToggle } from '@components/ui/mode-toggle';
 import { RadioGroup, RadioGroupItem } from '@components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui/select';
 import { Skeleton } from '@components/ui/skeleton';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@components/ui/table';
 import { ActivityLevel, ExpectedBodyEnum, MaleEnum, SpeedChangeWeightEnum } from '@lib/commonTypes';
+import { foodData } from '@lib/constant';
+import { caculateCarb, caculateFat, caculateProtein } from '@lib/utils';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
 import React from 'react';
@@ -17,13 +21,17 @@ export default function Home() {
   const [gender, setGender] = React.useState<MaleEnum>(MaleEnum.Male);
   const [age, setAge] = React.useState<number>(23);
   const [isLoadingTdee, setIsLoadingTdee] = React.useState<boolean>(false);
-  const [height, setHeight] = React.useState<number>(100);
-  const [weight, setWeight] = React.useState<number>(20);
-  const [levelExercise, setLevelExercise] = React.useState<ActivityLevel>(ActivityLevel.Sedentary);
+  const [height, setHeight] = React.useState<number>(160);
+  const [weight, setWeight] = React.useState<number>(59.3);
+  const [levelExercise, setLevelExercise] = React.useState<ActivityLevel>(ActivityLevel.VeryActive);
   const [expectedWeight, setExpectedWeight] = React.useState<number>(55);
   const [expectedBody, setExpectedBody] = React.useState<ExpectedBodyEnum>(ExpectedBodyEnum.ReduceFat);
   const [speedChangeWeight, setSpeedChangeWeight] = React.useState<SpeedChangeWeightEnum>(SpeedChangeWeightEnum.Normal);
   const [yourTdee, setYourTdee] = React.useState<number>(0);
+  const [protein, setProtein] = React.useState<number>(0);
+  const [fat, setFat] = React.useState<number>(0);
+  const [carb, setCarb] = React.useState<number>(0);
+
   const listActivityLevel = [
     ActivityLevel.Sedentary,
     ActivityLevel.LightlyActive,
@@ -74,12 +82,19 @@ export default function Home() {
     if (result) {
       setIsLoadingTdee(false);
       setYourTdee(result);
+      setProtein(caculateProtein(weight));
+      const fatIn = caculateFat(result - 500, caculateProtein(weight));
+      setFat(fatIn);
+      setCarb(caculateCarb(fatIn));
     }
   };
   return (
-    <main className='flex flex-row min-h-screen justify-between p-12'>
-      <aside className='flex-[2_2_0%] border-4 border-blue-300 rounded-lg p-5 box-content'>
-        <h2 className='text-3xl font-bold text-blue-500'>TDEE là gì? Tính TDEE giảm cân lành mạnh</h2>
+    <main className='flex flex-row min-h-screen justify-between p-12 relative'>
+      <div className='absolute right-0 bg-green-200'>
+        <ModeToggle className='border-none' />
+      </div>
+      <aside className='flex-[2_2_0%] border-4 border-green-300 rounded-lg p-5 box-content'>
+        <h2 className='text-3xl font-bold text-green-500'>TDEE là gì? Tính TDEE giảm cân lành mạnh</h2>
         <div>
           <p>
             TDEE (Total Daily Energy Expenditure) là tất cả năng lượng cần thiết cho hoạt động mỗi ngày của bạn. Tính
@@ -114,12 +129,12 @@ export default function Home() {
         </div>
       </aside>
       <section className='flex-[3_3_0%] p-5'>
-        <h1 className='text-3xl font-bold text-blue-500 py-2'>CÔNG CỤ TÍNH TDEE ONLINE</h1>
+        <h1 className='text-3xl font-bold text-green-500 py-2'>CÔNG CỤ TÍNH TDEE ONLINE</h1>
         <p>Tính lượng calo cần thiết cho cơ thể mỗi ngày</p>
         <p>Cho chúng mình xin vài thông tin để tính TDEE cho bạn nhé.</p>
         <section className='flex gap-x-10 mt-5'>
           <div>
-            <h2 className='font-bold text-blue-500 text-xl mb-2'>Mục Tiêu</h2>
+            <h2 className='font-bold text-green-500 text-xl mb-2'>Mục Tiêu</h2>
             <Select defaultValue={expectedBody}>
               <SelectTrigger className='w-[180px]'>
                 <SelectValue defaultChecked={true} defaultValue={'decrease'} placeholder='Select target' />
@@ -132,7 +147,7 @@ export default function Home() {
             </Select>
           </div>
           <div>
-            <h2 className='font-bold text-blue-500 text-xl mb-2'>Giới tính</h2>
+            <h2 className='font-bold text-green-500 text-xl mb-2'>Giới tính</h2>
             <RadioGroup
               onValueChange={value => setGender(value as MaleEnum)}
               className='flex py-2'
@@ -167,14 +182,14 @@ export default function Home() {
           />
         </section>
         <section className='mt-5'>
-          <h2 className='font-bold text-blue-500 mb-2 text-xl'>CƯỜNG ĐỘ TẬP LUYỆN</h2>
+          <h2 className='font-bold text-green-500 mb-2 text-xl'>CƯỜNG ĐỘ TẬP LUYỆN</h2>
           <div className='flex gap-x-4'>
             {listActivityLevel.map((item, index) => (
               <Button
                 onClick={() => setLevelExercise(item)}
                 className={clsx(
-                  'min-w-16 hover:bg-blue-50 hover:text-blue-500 hover:border-blue-500',
-                  item === levelExercise ? 'bg-blue-50 text-blue-500 border-blue-500' : ''
+                  'min-w-16 hover:bg-green-50 hover:text-green-500 hover:border-green-500',
+                  item === levelExercise ? 'bg-green-50 text-green-500 border-green-500' : ''
                 )}
                 variant='outline'
                 key={item}
@@ -187,7 +202,7 @@ export default function Home() {
         </section>
         <section className='flex gap-x-20 mt-5'>
           <div>
-            <h2 className='font-bold text-blue-500 text-xl mb-2'>Cân nặng mục tiêu</h2>
+            <h2 className='font-bold text-green-500 text-xl mb-2'>Cân nặng mục tiêu</h2>
             <Input
               className='expected-w'
               onChange={e => setExpectedWeight(Number(e.target.value))}
@@ -196,7 +211,7 @@ export default function Home() {
             />
           </div>
           <div>
-            <h2 className='font-bold text-blue-500 text-xl mb-2'>Tốc độ giảm cân</h2>
+            <h2 className='font-bold text-green-500 text-xl mb-2'>Tốc độ giảm cân</h2>
             <Select value={speedChangeWeight}>
               <SelectTrigger className='w-[180px]'>
                 <SelectValue defaultChecked={true} defaultValue={'slow'} />
@@ -220,17 +235,59 @@ export default function Home() {
             onClick={caculateTdee}
             disabled={isLoadingTdee}
             variant={'outline'}
-            className='my-5 font-bold text-blue-500 hover:bg-blue-100 hover:text-blue-500'
+            className='my-5 font-bold text-green-500 hover:bg-green-100 hover:text-green-500'
           >
             {isLoadingTdee && <ReloadIcon className='mr-2 h-4 w-4 animate-spin' />}
             Tính TDEE
           </Button>
         </section>
-        <section>
-          {isLoadingTdee && <Skeleton className='h-10 w-96 rounded-sm' />}
-          {!isLoadingTdee && !!yourTdee && (
-            <h2 className='font-bold text-blue-500 text-xl mb-2'>TDEE của bạn : {yourTdee}</h2>
-          )}
+        {isLoadingTdee ? (
+          <section className='space-y-2 my-5'>
+            <Skeleton className='h-6 w-60 rounded-sm' />
+            <Skeleton className='h-6 w-60 rounded-sm' />
+            <Skeleton className='h-6 w-60 rounded-sm' />
+            <Skeleton className='h-6 w-60 rounded-sm' />
+          </section>
+        ) : (
+          <section className='my-5'>
+            {!isLoadingTdee && !!yourTdee && (
+              <>
+                <h2 className='font-bold text-green-500 text-xl mb-2'>TDEE của bạn : {yourTdee}</h2>
+                <h2 className='font-semibold text-green-500 text-md mb-2'>
+                  Lượng calo cần thiết để <b>Giảm mỡ</b> : {yourTdee - 500} (calo 1 ngày)
+                </h2>
+                <ul className='list- font-semibold'>
+                  <li>Khối lượng protein cần ăn : {protein} g</li>
+                  <li>Khối lượng fat cần ăn : {fat} g</li>
+                  <li>Khối lượng carb cần ăn : {carb} g</li>
+                </ul>
+              </>
+            )}
+          </section>
+        )}
+        <section className='pt-5 border-t'>
+          <h2 className='font-bold text-green-500 text-xl mb-2 text-center'>Bảng thực đơn</h2>
+          <Table>
+            <TableCaption>Danh sách thực phẩm mỗi ngày</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead className='w-[200px] font-bold text-xl'>Thực phẩm</TableHead>
+                <TableHead className='font-bold text-xl'>Protein</TableHead>
+                <TableHead className='font-bold text-xl'>Carb</TableHead>
+                <TableHead className='text-right font-bold text-xl'>Fat</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {foodData.map(food => (
+                <TableRow key={food.food}>
+                  <TableCell className='font-medium'>{food.food}</TableCell>
+                  <TableCell className='font-medium'>{food.protein}</TableCell>
+                  <TableCell className='font-medium'>{food.carb}</TableCell>
+                  <TableCell className='font-medium text-right'>{food.fat}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </section>
       </section>
     </main>
