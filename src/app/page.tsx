@@ -25,8 +25,8 @@ export default function Home() {
   const [weight, setWeight] = React.useState<number>(59.3);
   const [levelExercise, setLevelExercise] = React.useState<ActivityLevel>(ActivityLevel.VeryActive);
   const [expectedWeight, setExpectedWeight] = React.useState<number>(55);
-  const [expectedBody, setExpectedBody] = React.useState<ExpectedBodyEnum>(ExpectedBodyEnum.ReduceFat);
-  const [speedChangeWeight, setSpeedChangeWeight] = React.useState<SpeedChangeWeightEnum>(SpeedChangeWeightEnum.Normal);
+  const [expectedBody] = React.useState<ExpectedBodyEnum>(ExpectedBodyEnum.ReduceFat);
+  const [speedChangeWeight] = React.useState<SpeedChangeWeightEnum>(SpeedChangeWeightEnum.Normal);
   const [yourTdee, setYourTdee] = React.useState<number>(0);
   const [protein, setProtein] = React.useState<number>(0);
   const [fat, setFat] = React.useState<number>(0);
@@ -91,7 +91,7 @@ export default function Home() {
   return (
     <main className='flex flex-row min-h-screen justify-between p-12 relative'>
       <div className='absolute right-0 bg-green-200'>
-        <ModeToggle className='border-none' />
+        <ModeToggle />
       </div>
       <aside className='flex-[2_2_0%] border-4 border-green-300 rounded-lg p-5 box-content'>
         <h2 className='text-3xl font-bold text-green-500'>TDEE là gì? Tính TDEE giảm cân lành mạnh</h2>
